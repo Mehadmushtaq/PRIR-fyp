@@ -3,15 +3,14 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate , login , logout
 from django.http import HttpResponseRedirect,HttpResponse
-from pipenv.core import console
+#from pipenv.core import console
 from .forms import *
 
 
 from .models import Profile
-from products.models import *
+# from products.models import *
 from accounts.models import Cart , CartItems
-
-
+from brand.models import Product
 def login_page(request):
     
     if request.method == 'POST':
@@ -73,60 +72,6 @@ def brand(request):
 def brand_login(request):
     return render(request,'accounts/brand_login.html')
 
-
-
-
-# def brand_register(request):
-#     if request.method == 'POST':
-#         context = {}
-#         # create object of form
-#         form = BrandForm(request.POST or  None, request.FILES or None)
-#
-#         # check if form data is valid
-#         if form.is_valid():
-#             form.save()
-#         context['form'] = form
-#         return redirect('accounts/brand_login.html')
-#     return render(request , 'accounts/brand_register.html')
-#
-#
-# def brand_login(request):
-#     if request.method=='POST':
-#         brand_email = request.POST['brand_email']
-#         brand_password = request.POST['brand_password']
-#         brands = Brand.objects.filter(Brand_Email=brand_email,Brand_Password=brand_password)
-#
-#         if brands.exists():
-#            for brand in brands:
-#                BrandId = brand.id
-#            response = redirect('brand_dashboard')
-#            response.set_cookie('Brand_ID',BrandId)
-#            return response
-#         else:
-#
-#             messages.error(request,"Brand Credentials")
-#             return render(request, 'brand_login.html')
-#
-#     return render(request,'brand_login.html')
-
-# def brand_dashboard(request):
-#
-#     BrandId = request.COOKIES['Brand_ID']
-#     brands = Brand.objects.filter(id=BrandId)
-#
-#     for brand in brands:
-#         CBrand = Brand(Brand_Name=brand.Brand_Name, Brand_Email=brand.Brand_Email, Brand_Password=brand.Brand_Password,
-#                        Brand_Address=brand.Brand_Address, Brand_City=brand.Brand_City, Brand_State=brand.Brand_State,
-#                        Brand_Zip=brand.Brand_Zip, Brands_Logo=brand.Brands_Logo)
-#
-#
-#     Brand_Products = Product.objects.filter(Product_Brand__Brand_Name__contains=CBrand.Brand_Name)
-#     context = {
-#         'BProducts': Brand_Products
-#     }
-#     return render (request,"brand_dashboard.html",context)
-
-
 def activate_email(request , email_token):
     try:
         user = Profile.objects.get(email_token= email_token)
@@ -139,19 +84,13 @@ def activate_email(request , email_token):
 
 
 def add_to_cart(request,uid):
-    variant = request.GET.get('variant')
-    product = Product.objects.get(uid=uid)
+
+    product = Product.objects.filter(id=uid)
     user = request.user
     cart, _  = Cart.objects.get_or_create(user=user,is_paid=False)
     cart_item = CartItems.objects.create(cart=cart,product=product)
 
-    if variant:                                                                   #variant is not storing in cart_items
-        variant = request.GET.get('variant')
-        print(variant)
-        console.log(variant)
-        size_variant = SizeVariant.objects.get(size_name=variant)
-        cart_item.size_variant = size_variant
-        cart_item.save()
+    cart_item.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 

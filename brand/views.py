@@ -35,7 +35,7 @@ def brand_login(request):
         if brands.exists():
            for brand in brands:
                BrandId = brand.id
-           response = redirect('brand/brand_dashboard')
+           response = redirect('brand_dashboard')
            response.set_cookie('Brand_ID',BrandId)
            return response
         else:

@@ -5,7 +5,7 @@ from django.dispatch import receiver
 import uuid
 from products.models import *
 from base.emails import send_account_activation_email
-
+from brand.models import Product
 
 class Profile(BaseModel):
     user = models.OneToOneField(User , on_delete=models.CASCADE , related_name="profile")
@@ -39,22 +39,11 @@ class Cart(BaseModel):
 class CartItems(BaseModel):
     cart = models.ForeignKey(Cart , on_delete=models.CASCADE , related_name="cart_items")
     product = models.ForeignKey(Product , on_delete=models.SET_NULL , null=True, blank=True)
-    color_variant = models.ForeignKey(ColorVariant , on_delete=models.SET_NULL , null=True, blank=True)
-    size_variant = models.ForeignKey(SizeVariant , on_delete=models.SET_NULL , null=True, blank=True)
-
 
     def get_product_price(self):
-        price = [self.product.price]
+        price = [self.product.Product_Price]
 
-        if self.color_variant:
-            color_variant_price = self.color_variant.price
-            price.append(color_variant_price)
-
-        if self.size_variant:
-            size_variant_price = self.size_variant.price
-            price.append(size_variant_price)
-
-        return sum(price)
+        return price
 
 
 
